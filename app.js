@@ -5,6 +5,7 @@ const cors = require('cors');
 const db = require('./config/db'); 
 const port = 3000;
 const app = express();
+const paypalRoutes = require('./routes/paypalRoutes');
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -26,10 +27,11 @@ app.use('/uploads', express.static('uploads'));
 
 // Homepage Route
 app.get('/', (req, res) => {
-    res.render('index'); // Render the homepage view (home.ejs)
+    res.render('index', {currentPage: 'home'}); // Render the homepage view (home.ejs)
 });
 
 app.use('/', routes)
+app.use('/api/paypal', paypalRoutes); // Prefix PayPal routes
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

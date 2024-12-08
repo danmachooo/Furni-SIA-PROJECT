@@ -39,14 +39,12 @@
                 <p class="small">Don't have an account? <a href="/register" class="text-decoration-none">Sign up here</a></p>
               </div>
               <div class="text-center mt-1">
-                <a href="a/forgot-password" class="small text-muted">Forgot password?</a>
+                <a href="#" id="forgotPasswordLink" class="small text-muted">Forgot password?</a>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-    
     </main>
     
     <!-- Include the footer partial -->
@@ -54,60 +52,91 @@
     
     <!-- Include the scripts partial -->
     <%- include('partials/scripts') %>
-  </body>
+
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+      document.getElementById('loginForm').addEventListener('submit', async function(event) {
+          event.preventDefault();
+      
+          // Create an object to hold the form data
+          const formData = new FormData(this);
+          const data = Object.fromEntries(formData); // Convert FormData to an object
+      
+          try {
+              const response = await fetch(this.action, {
+                  method: this.method,
+                  headers: {
+                      'Content-Type': 'application/json', // Set the content type to JSON
+                  },
+                  body: JSON.stringify(data), // Convert the data to JSON
+              });
+      
+              const result = await response.json();
+              const blockedWords = ['blocked']; // Replace with your blocked words
+              const blockedRegex = new RegExp(blockedWords.join('|'), 'i'); // Create a regex pattern
+      
+              if (result.success) {
+                  if (result.message === 'admin') {
+                      Swal.fire({
+                          icon: 'success',
+                          title: 'Login Successful',
+                          text: 'Welcome, Admin!',
+                          timer: 1500,
+                          showConfirmButton: false
+                      }).then(() => {
+                          window.location.href = '/admin'; // Redirect admin to /admin page
+                      });
+                  } else if (result.message === 'customer') {
+                      // Check for blocked words
+                      if (blockedRegex.test(result.message)) {
+                          Swal.fire({
+                              icon: 'error',
+                              title: 'Access Denied',
+                              text: 'Your account is blocked.',
+                          });
+                      } else {
+                          Swal.fire({
+                              icon: 'success',
+                              title: 'Login Successful',
+                              text: 'Welcome back!',
+                              timer: 1500,
+                              showConfirmButton: false
+                          }).then(() => {
+                              window.location.href = '/'; // Redirect customer to home page
+                          });
+                      }
+                  }
+              } else {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Login Failed',
+                      text: result.message,
+                  });
+              }
+          } catch (error) {
+              console.error('Error during login:', error); // Log any errors
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'An unexpected error occurred. Please try again later.',
+              });
+          }
+      });
+      
+      // Add event listener for the forgot password link
+      document.getElementById('forgotPasswordLink').addEventListener('click', function(event) {
+          event.preventDefault();
+          Swal.fire({
+              icon: 'info',
+              title: 'Come on, you got this!',
+              text: 'You need to remember your password! I believe in you!',
+              confirmButtonText: 'I\'ll try again',
+          });
+      });
+      </script>  </body>
 </html>
 
-<script>
-document.getElementById('loginForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    // Create an object to hold the form data
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData); // Convert FormData to an object
-
-    try {
-        const response = await fetch(this.action, {
-            method: this.method,
-            headers: {
-                'Content-Type': 'application/json', // Set the content type to JSON
-            },
-            body: JSON.stringify(data), // Convert the data to JSON
-        });
-
-        const result = await response.json();
-        const blockedWords = ['blocked']; // Replace with your blocked words
-        const blockedRegex = new RegExp(blockedWords.join('|'), 'i'); // Create a regex pattern
-
-        if (result.success) {
-            if (result.message === 'admin') {
-                window.location.href = '/admin'; // Redirect admin to /admin page
-            } else if (result.message === 'customer') {
-                // Check for blocked words
-                if (blockedRegex.test(result.message)) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Access Denied',
-                        text: 'Your account is blocked.',
-                    });
-                } else {
-                    window.location.href = '/'; // Redirect customer to home page
-                }
-            }
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Failed',
-                text: result.message,
-            });
-        }
-    } catch (error) {
-        console.error('Error during login:', error); // Log any errors
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An unexpected error occurred. Please try again later.',
-        });
-    }
-});
-
-</script>

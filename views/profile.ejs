@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head', { title: 'User Profile' }) %>
+<body>
+
+<%- include('partials/header', { currentPage: 'profile' }) %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <h2 class="mb-4 text-center">User Profile</h2>
+      
+      <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-person-circle fs-1 me-3 text-primary"></i>
+            <div>
+              <h5 class="card-title mb-0"><%= user.name %></h5>
+              <p class="text-muted mb-0"><%= user.email %></p>
+            </div>
+          </div>
+          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#updateNameForm">
+            <i class="bi bi-pencil-square me-2"></i>Update Name
+          </button>
+        </div>
+      </div>
+
+      <div class="collapse mb-4" id="updateNameForm">
+        <div class="card shadow-sm border-0">
+          <div class="card-body">
+            <h5 class="card-title">Update Name</h5>
+            <form id="nameForm" action="/profile/update-name" method="POST">
+              <div class="mb-3">
+                <label for="newName" class="form-label">New Name</label>
+                <input type="text" class="form-control" id="newName" name="newName" required>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg me-2"></i>Update Name
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Change Password</h5>
+          <form id="passwordForm" action="/profile/change-password" method="POST">
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label">Current Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                <button class="btn btn-outline-secondary toggle-password" type="button">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                <button class="btn btn-outline-secondary toggle-password" type="button">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">Confirm New Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                <button class="btn btn-outline-secondary toggle-password" type="button">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-lock me-2"></i>Change Password
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Password Change Confirmation Modal -->
+<div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="passwordChangeModalLabel">Password Changed</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Your password has been successfully changed.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS, Bootstrap Icons, and other scripts -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/tiny-slider.js"></script>
+<script src="/js/custom.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Toggle password visibility
+  document.querySelectorAll('.toggle-password').forEach(button => {
+    button.addEventListener('click', function() {
+      const input = this.previousElementSibling;
+      const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+      input.setAttribute('type', type);
+      this.querySelector('i').classList.toggle('bi-eye');
+      this.querySelector('i').classList.toggle('bi-eye-slash');
+    });
+  });
+
+  // Form validation
+  const nameForm = document.getElementById('nameForm');
+  const passwordForm = document.getElementById('passwordForm');
+
+  nameForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (this.checkValidity()) {
+      // Submit the form
+      this.submit();
+    } else {
+      e.stopPropagation();
+    }
+    this.classList.add('was-validated');
+  });
+
+  passwordForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (this.checkValidity() && validatePasswords()) {
+      // Submit the form
+      this.submit();
+      // Show confirmation modal
+      const modal = new bootstrap.Modal(document.getElementById('passwordChangeModal'));
+      modal.show();
+    } else {
+      e.stopPropagation();
+    }
+    this.classList.add('was-validated');
+  });
+
+  function validatePasswords() {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    if (newPassword !== confirmPassword) {
+      document.getElementById('confirmPassword').setCustomValidity("Passwords don't match");
+      return false;
+    } else {
+      document.getElementById('confirmPassword').setCustomValidity('');
+      return true;
+    }
+  }
+
+  // Clear custom validity on input
+  document.getElementById('confirmPassword').addEventListener('input', function() {
+    this.setCustomValidity('');
+  });
+});
+</script>
+
+</body>
+</html>
+

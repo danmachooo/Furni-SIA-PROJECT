@@ -23,16 +23,12 @@
             
             <!-- Add to Cart Button -->
             <div class="mt-4">
-              <span class="icon-cross add-to-cart" 
-                    data-id="<%= product.id %>" 
-                    data-name="<%= product.name %>" 
-                    data-price="<%= product.price %>">
-              </span>
-              <!-- Corrected function call -->
-              <button class="btn btn-primary mt-2 add-to-cart" data-id="<%= product.id %>" 
-                data-name="<%= product.name %>" 
-                data-price="<%= product.price %>"
-                data-image="<%=product.image_path%>">Add to Cart
+              <button class="btn btn-primary add-to-cart" 
+                      data-id="<%= product.id %>" 
+                      data-name="<%= product.name %>" 
+                      data-price="<%= product.price %>"
+                      data-image="<%= product.image_path %>">
+                <i class="bi bi-cart-plus me-2"></i>Add to Cart
               </button>
             </div>
           </div>
@@ -41,11 +37,11 @@
     </main>
 
     <!-- Start Footer Section -->
-    <footer class="footer">
+    <footer class="footer-section bg-light py-5 mt-5">
       <div class="container">
         <div class="row">
           <div class="col text-center">
-            <p>&copy; <%= new Date().getFullYear() %> Your Company Name. All Rights Reserved.</p>
+            <p class="mb-0">&copy; <%= new Date().getFullYear() %> Your Company Name. All Rights Reserved.</p>
           </div>
         </div>
       </div>
@@ -55,17 +51,26 @@
     <!-- Include the scripts partial -->
     <%- include('partials/scripts') %>
 
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+
     <script>
-      document.querySelectorAll('.add-to-cart').forEach(icon => {
-        icon.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent the default anchor behavior
+      document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', function(event) {
+          event.preventDefault();
     
           const productId = this.getAttribute('data-id');
           const name = this.getAttribute('data-name');
           const price = parseFloat(this.getAttribute('data-price'));
           const image_path = this.getAttribute('data-image');
           const quantity = 1; // Default quantity
-          console.log('Product View', image_path);
+
+          // Disable the button and show loading state
+          this.disabled = true;
+          this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Adding...';
+    
           fetch('/cart/add', {
             method: 'POST',
             headers: {
@@ -75,13 +80,44 @@
           })
           .then(response => response.json())
           .then(data => {
-            alert(data.message); // Show success message
+            // Re-enable the button and restore original text
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Add to Cart';
+
+            // Show success message using SweetAlert2
+            Swal.fire({
+              title: 'Added to Cart!',
+              text: `${name} has been added to your cart.`,
+              icon: 'success',
+              confirmButtonText: 'Continue Shopping',
+              showCancelButton: true,
+              cancelButtonText: 'View Cart',
+              cancelButtonColor: '#3085d6',
+              confirmButtonColor: '#28a745'
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.cancel) {
+                // Redirect to cart page if "View Cart" is clicked
+                window.location.href = '/cart';
+              }
+            });
           })
           .catch(error => {
+            // Re-enable the button and restore original text
+            this.disabled = false;
+            this.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Add to Cart';
+
             console.error('Error adding item to cart:', error);
+            // Show error message using SweetAlert2
+            Swal.fire({
+              title: 'Oops...',
+              text: 'There was an error adding the item to your cart. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
           });
         });
       });
     </script>
   </body>
 </html>
+

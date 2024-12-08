@@ -1,114 +1,181 @@
 <!doctype html>
 <html lang="en">
   <%- include('partials/head') %>
-
-  <body>
+  <body class="bg-light">
     <%- include('partials/header') %>
-    <main>
-      <div class="untree_co-section">
-        <div class="container">
-          <div class="row mb-5"></div>
-          <div class="row">
-            <div class="col-md-6 mb-5 mb-md-0">
-              <h2 class="h3 mb-3 text-black">Billing Details</h2>
-              <div class="p-3 p-lg-5 border bg-white">
-                <form action="/checkout" method="POST">
-                  <div class="form-group row">
-                    <div class="col-md-6">
-                      <label for="c_fname" class="text-black">First Name <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="c_fname" name="c_fname" value="<%= user ? user.name.split(' ')[0] : '' %>" required>
-                    </div>
-                    <div class="col-md-6">
-                      <label for="c_lname" class="text-black">Last Name <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="c_lname" name="c_lname" value="<%= user ? user.name.split(' ')[1] : '' %>" required>
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <div class="col-md-12">
-                      <label for="c_address" class="text-black">Address <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="c_address" name="c_address" required>
-                    </div>
-                  </div>
-
-                  <div class="form-group row">
-                    <div class="col-md-6">
-                      <label for="c_state_country" class="text-black">State / Country <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="c_state_country" name="c_state_country" required>
-                    </div>
-                    <div class="col-md-6">
-                      <label for="c_postal_zip" class="text-black">Postal / Zip <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="c_postal_zip" name="c_postal_zip" required>
-                    </div>
-                  </div>
-
-                  <div class="form-group row mb-5">
-                    <div class="col-md-6">
-                      <label for="c_email_address" class="text-black">Email Address <span class="text-danger">*</span></label>
-                      <input type="email" class="form-control" id="c_email_address" name="c_email_address" required>
-                    </div>
-                    <div class="col-md-6">
-                      <label for="c_phone" class="text-black">Phone <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control" id="c_phone" name="c_phone" placeholder="Phone Number" required>
-                    </div>
-                  </div>
-
-                  
-
-                  <div class="form-group">
-                    <label for="c_order_notes" class="text-black">Order Notes</label>
-                    <textarea name="c_order_notes" id="c_order_notes" cols="30" rows="5" class="form-control" placeholder="Write your notes here..."></textarea>
-                  </div>
-
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-black btn-lg mt-2 py-3 btn-block">Place Order</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <div class="col-md-6">
-              <div class="row mb-5">
-                <div class="col-md-12">
-                  <h2 class="h3 mb-3 text-black">Your Order</h2>
-                  <div class="p-3 p-lg-5 border bg-white">
-                    <table class="table site-block-order-table mb-5">
-                      <thead>
+    <main class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="card-title h3 mb-4 text-center">Your Order</h2>
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Product</th>
+                      <th class="text-end">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (cart && cart.length) { %>
+                      <% cart.forEach(item => { %>
                         <tr>
-                          <th>Product</th>
-                          <th>Total</th>
+                          <td><%= item.name %> <span class="badge bg-secondary mx-2"><%= item.quantity %></span></td>
+                          <td class="text-end">$<%= (item.price * item.quantity).toFixed(2) %></td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        <% if (cart.length) { %>
-                            <% cart.forEach(item => { %>
-                                <tr>
-                                    <td><%= item.name %> <strong class="mx-2">x</strong> <%= item.quantity %></td>
-                                    <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
-                                </tr>
-                            <% }); %>
-                            <tr>
-                                <td class="text-black font-weight-bold"><strong>Cart Subtotal</strong></td>
-                                <td class="text-black">$<%= cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %></td>
-                            </tr>
-                            <tr>
-                                <td class="text-black font-weight-bold"><strong>Order Total</strong></td>
-                                <td class="text-black font-weight-bold"><strong>$<%= cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %></strong></td>
-                            </tr>
-                        <% } else { %>
-                            <tr>
-                                <td colspan="2">Your cart is empty.</td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                    </table>
-                  </div>
+                      <% }); %>
+                      <tr class="table-active">
+                        <td class="fw-bold">Order Total</td>
+                        <td class="fw-bold text-end">$<%= cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %></td>
+                      </tr>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="2" class="text-center text-muted">Your cart is empty.</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+
+              <h3 class="h5 mb-3 mt-4">Payment Method</h3>
+              <div class="mb-4">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="paymentMethod" id="cashOnDelivery" value="cash" checked>
+                  <label class="form-check-label" for="cashOnDelivery">
+                    Cash on Delivery
+                  </label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
+                  <label class="form-check-label" for="paypal">
+                    PayPal
+                  </label>
                 </div>
               </div>
+
+              <div id="paypal-button-container" class="mb-3" style="display: none;"></div>
+              <button id="placeOrderBtn" class="btn btn-primary w-100 py-2">Place Order</button>
             </div>
           </div>
         </div>
       </div>
     </main>
-  </body>
+
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const paymentMethod = document.getElementsByName('paymentMethod');
+        const paypalButtonContainer = document.getElementById('paypal-button-container');
+        const placeOrderBtn = document.getElementById('placeOrderBtn');
+    
+        function togglePaymentMethod() {
+          if (this.value === 'paypal') {
+            paypalButtonContainer.style.display = 'block';
+            placeOrderBtn.style.display = 'none';
+          } else {
+            paypalButtonContainer.style.display = 'none';
+            placeOrderBtn.style.display = 'block';
+          }
+        }
+        paymentMethod.forEach(radio => radio.addEventListener('change', togglePaymentMethod));
+    
+        // Function to handle the checkout process
+        async function handleCheckout(paymentMethod) {
+          try {
+            const response = await fetch('/checkout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                paymentMethod: paymentMethod
+              })
+            });
+    
+            if (!response.ok) {
+              throw new Error('Checkout failed');
+            }
+  
+          } catch (error) {
+            console.error('Error during checkout:', error);
+            Swal.fire({
+              title: 'Checkout Failed',
+              text: 'There was an error processing your order. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+        }
+    
+        paypal.Buttons({
+          createOrder: function () {
+            return fetch('/api/paypal/create-order', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                amount: '<%= cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %>',
+                currency: 'USD' 
+              })
+            })
+            .then(response => response.json())
+            .then(order => order.id);
+          },
+          onApprove: function (data, actions) {
+            return fetch(`/api/paypal/capture-order/${data.orderID}`, {
+              method: 'POST'
+            })
+            .then(response => response.json())
+            .then(details => {
+              // Handle checkout after successful PayPal payment
+              handleCheckout('paypal')
+                .then(() => {
+                  Swal.fire({
+                    title: 'Payment Successful!',
+                    text: 'Transaction completed by ' + details.payer.name.given_name,
+                    icon: 'success',
+                    confirmButtonText: 'Continue'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = '/thankyou';
+                    }
+                  });
+                });
+            });
+          },
+          onError: function (err) {
+            Swal.fire({
+              title: 'Payment Failed',
+              text: 'There was an error processing your payment. Please try again.',
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+        }).render('#paypal-button-container');
+    
+        placeOrderBtn.addEventListener('click', function() {
+          // Handle cash on delivery checkout
+          handleCheckout('cash')
+            .then(() => {
+              Swal.fire({
+                title: 'Order Placed!',
+                text: 'Your order has been placed successfully!',
+                icon: 'success',
+                confirmButtonText: 'Continue'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = '/thankyou';
+                }
+              });
+            });
+        });
+      });
+    </script>  </body>
 </html>
+

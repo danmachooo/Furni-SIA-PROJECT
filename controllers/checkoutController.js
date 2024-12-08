@@ -44,7 +44,8 @@ const CheckoutController = {
         res.render('checkout', {
             title: 'Checkout',
             user, // Pass user details to the view
-            cart // Pass cart items to the view
+            cart, // Pass cart items to the view
+            
         });
     }
 };

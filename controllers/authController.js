@@ -121,13 +121,14 @@ const verifyEmail = async (req, res) => {
 const renderLogin = (req, res) => {
     res.render('login', {
         title: 'login',
-        query: req.query
+        query: req.query,
     }); 
 }
 
 const renderRegister = (req, res) => {
     res.render('register', {
-        title: 'register'
+        title: 'register',
+
     });
 }
 

@@ -1,27 +1,74 @@
 <!-- Start Header/Navigation -->
 <nav class="custom-navbar navbar navbar-expand-md navbar-dark bg-dark" aria-label="Furni navigation bar">
   <div class="container">
-    <a class="navbar-brand" href="/">Furnitures<span>.</span></a>
+    <a class="navbar-brand" href="/">Furni<span>.</span></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarsFurni">
       <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-        <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
-        <li><a class="nav-link" href="/shop">Shop</a></li>
-        <li><a class="nav-link" href="#">About us</a></li>
-        <li><a class="nav-link" href="/contact">Contact us</a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/shop">Shop</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/about">About us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact">Contact us</a>
+        </li>
       </ul>
       <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-        <% if (session.userId) { %> <!-- Check if user is logged in -->
-          <li><a class="nav-link" href="/logout">Logout</a></li>
+        <% if (typeof user !== 'undefined' && user) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="logoutLink">Logout</a>
+          </li>
         <% } else { %>
-          <li><a class="nav-link" href="/login"><img src="/uploads/images/user.svg"></a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="/profile"><img src="/uploads/images/user.svg" alt="User"></a>
+          </li>
         <% } %>
-        <li><a class="nav-link" href="/cart"><img src="/uploads/images/cart.svg"></a></li>
+        <li class="nav-item">
+          <a class="nav-link" href="/cart"><img src="/uploads/images/cart.svg" alt="Cart"></a>
+        </li>
       </ul>
     </div>
   </div>
 </nav>
 <!-- End Header/Navigation -->
-<script src=""></script>
+
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.all.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const logoutLink = document.getElementById('logoutLink');
+  
+  if (logoutLink) {
+    logoutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, logout'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Perform logout action
+          window.location.href = '/logout';
+        }
+      });
+    });
+  }
+});
+</script>
+

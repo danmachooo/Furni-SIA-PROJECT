@@ -66,7 +66,7 @@ const ProductController = {
                 products,
                 categories,
                 selectedCategoryId, // Pass the selected categoryId to maintain the selected state
-                title: 'Shop'
+                title: 'Shop',
             });
         } catch (error) {
             console.error('Error fetching products:', error);

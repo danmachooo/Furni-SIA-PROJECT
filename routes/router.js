@@ -8,6 +8,7 @@ const CheckoutController = require('../controllers/checkoutController');
 const UserController = require('../controllers/userController');
 const authMiddleware = require('../middlewares/authMiddleware'); // Authentication middleware
 const upload = require('../middlewares/multerMiddleware'); // Multer middleware for file uploads
+const {paypal} = require('../services/paypal');
 
 const router = express.Router();
 const { pool } = require('../config/db');
@@ -112,5 +113,38 @@ router.get('/about', (req, res) => {
 });
 router.get('/contact', (req, res) => {
   res.render('contact', {title: 'contact'} );
+});
+router.get('/profile', UserController.displayUser);
+
+router.post('/profile/update-name/:id', UserController.updateName);
+router.post('/profile/change-password/:id', UserController.updatePassword);
+//PAYPAL ROUTES
+
+
+router.post('/create-order', async (req, res) => {
+  const { amount, currency } = req.body; // Dynamic values from frontend
+  try {
+    const order = await paypal.createOrder(amount, currency);
+    res.status(201).json(order);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.post('/capture-order/:orderID', async (req, res) => {
+  const { orderID } = req.params;
+  
+  // Create request to capture payment
+  const request = new paypal.orders.OrdersCaptureRequest(orderID);
+  request.requestBody({}); // The request body must be empty for capture
+  
+  try {
+    const capture = await client.execute(request);
+    console.log('Capture details:', capture.result);
+    res.json(capture.result); // Send response back to the frontend
+  } catch (err) {
+    console.error('Error capturing order:', err);
+    res.status(500).send({ error: 'Something went wrong while capturing the order' });
+  }
 });
 module.exports = router;
