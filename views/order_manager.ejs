@@ -44,7 +44,11 @@
     <!-- Order Management Table -->
     <div class="container mt-5">
         <h1 class="text-center mb-4">Order Management</h1>
-
+        <div class="d-flex justify-content-end mb-3">
+            <button id="generatePdf" class="btn btn-danger me-2">Generate PDF</button>
+            <button id="downloadExcel" class="btn btn-success">Download Excel</button>
+        </div>
+        
         <table id="ordersTable" class="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -80,19 +84,22 @@
                             <button class="btn btn-danger btn-sm btn-delete" data-id="<%= order.id %>">Cancel Order</button>
                         </td>
                     </tr>
-                <% }) %>
-            </tbody>
-        </table>
-    </div>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Bootstrap JS, DataTables JS, and SweetAlert2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
-    <!-- Bootstrap JS, DataTables JS, and SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script>
+        <script>
         $(document).ready(function() {
             // Initialize DataTable
             $('#ordersTable').DataTable({
@@ -172,5 +179,135 @@
         });
     </script>
 
+    <script>
+        $('#generatePdf').click(async function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+        
+            // Set margins and font
+            const margin = 10;
+            const pageWidth = doc.internal.pageSize.width;
+        
+            const logoUrl = '..\\uploads\\1729149621048-328779664.png'; 
+            const logoWidth = 30;
+            const logoHeight = 10;
+            await new Promise(resolve => {
+                const img = new Image();
+                img.src = logoUrl;
+                img.onload = () => {
+                    doc.addImage(img, 'PNG', margin, margin, logoWidth, logoHeight);
+                    resolve();
+                };
+            });
+        
+            // Add Title and Date
+            const title = 'Order Summary Report';
+            const date = new Date().toLocaleString();
+            doc.setFontSize(16);
+            doc.text(title, pageWidth / 2, margin + logoHeight + 10, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${date}`, pageWidth - margin, margin + logoHeight + 10, { align: 'right' });
+        
+            // Add Table
+            const table = $('#ordersTable').DataTable().rows().data().toArray().map(row => [
+                row[0], // Order ID
+                row[1], // User
+                $(row[2]).text().trim(), // Products (Extracted text)
+                row[3], // Total Price
+                $(row[4]).find('option:selected').text() // Order Status
+            ]);
+        
+            doc.autoTable({
+                head: [['Order ID', 'User', 'Products', 'Total Price', 'Order Status']],
+                body: table,
+                startY: margin + logoHeight + 20,
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    halign: 'center'
+                },
+                headStyles: {
+                    fillColor: [100, 100, 255], // Light blue
+                    textColor: 255,
+                    fontSize: 11
+                }
+            });
+        
+            // Calculate Insights
+            const totalOrders = table.length;
+            const totalRevenue = table.reduce((sum, row) => sum + parseFloat(row[3].replace('$', '')), 0).toFixed(2);
+            const statusCounts = table.reduce((counts, row) => {
+                counts[row[4]] = (counts[row[4]] || 0) + 1;
+                return counts;
+            }, {});
+        
+            const insights = `
+        This report contains ${totalOrders} total orders with a combined revenue of $${totalRevenue}.
+        Here is a breakdown of order statuses:
+        - Pending: ${statusCounts['Pending'] || 0}
+        - Processing: ${statusCounts['Processing'] || 0}
+        - Shipped: ${statusCounts['Shipped'] || 0}
+        
+        Recommendations:
+        1. Focus on reducing Pending orders to improve processing times.
+        2. Ensure timely shipment to enhance customer satisfaction.
+        3. Review top-selling products and consider optimizing inventory to meet demand.
+            `;
+        
+            // Add Insights/Recommendations
+            doc.setFontSize(12);
+            doc.text('Insights & Recommendations:', margin, doc.lastAutoTable.finalY + 10);
+            doc.setFontSize(10);
+            doc.text(insights, margin, doc.lastAutoTable.finalY + 20, { maxWidth: pageWidth - margin * 2 });
+        
+            // Add Footer with Page Number
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - margin, { align: 'center' });
+            }
+        
+            // Save PDF
+            doc.save('Order_Summary_Report.pdf');
+        });
+        document.getElementById('downloadExcel').addEventListener('click', function () {
+            const table = document.getElementById('ordersTable');
+        
+            // Extract table headers, excluding the "Actions" column
+            const headers = Array.from(table.querySelectorAll('thead tr th')).map((th, index) => {
+                // Exclude the last column (Actions)
+                return index === table.querySelectorAll('thead tr th').length - 1 ? null : th.innerText;
+            }).filter(header => header !== null);
+        
+            // Extract table rows, excluding the last column (Actions)
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr => {
+                const cells = Array.from(tr.querySelectorAll('td'));
+                return cells.slice(0, -1).map(cell => {
+                    // Check for lists and extract text
+                    if (cell.querySelector('ul')) {
+                        return Array.from(cell.querySelectorAll('li')).map(li => li.innerText).join(', ');
+                    }
+                    // Otherwise, extract plain text
+                    return cell.innerText;
+                });
+            });
+        
+            // Combine headers and rows into a single array
+            const data = [headers, ...rows];
+        
+            // Create a workbook and worksheet
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+        
+            // Append worksheet to workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Orders');
+        
+            // Generate Excel file
+            XLSX.writeFile(workbook, 'Order_Summary.xlsx');
+        });
+        
+        
+    </script>
 </body>
 </html>
