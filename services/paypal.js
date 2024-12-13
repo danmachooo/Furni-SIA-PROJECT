@@ -1,10 +1,15 @@
 const paypal = require('@paypal/checkout-server-sdk');
 
 // Set up PayPal Environment
+// const environment = new paypal.core.SandboxEnvironment(
+//     'AdRiao5Vsj_zvcK08j0meMLjzWocw9jgykWmy3_ed1X85mnTtDZa50FSS42A5Lq0CSbhAUKijltli1rT',
+//     'EEeChF0qX98lwCYe5QKOCg78JfeoQZ-UNFONK0bdmaFsGK-uNsZYOdlO2sWS-iCzZBv6Ihm2ALu_b-pa'
+// );
+
 const environment = new paypal.core.SandboxEnvironment(
-    'AdRiao5Vsj_zvcK08j0meMLjzWocw9jgykWmy3_ed1X85mnTtDZa50FSS42A5Lq0CSbhAUKijltli1rT',
-    'EEeChF0qX98lwCYe5QKOCg78JfeoQZ-UNFONK0bdmaFsGK-uNsZYOdlO2sWS-iCzZBv6Ihm2ALu_b-pa'
-);
+    'AWIfQ50062-YIWiEMv87OeK3rmoKZBjBS57C5VtIXMV5Ua_H5MrjRneW4TJ89Svcv4dikk6l_XOJUR3T',
+    'EJ07-G2Q3_DESm4b8MGveM0boOe3zJ68MHjKh8otlfwUzJJq2dasESjiupBARYXMcSJyhHpN3jkegx8r'
+) 
 const client = new paypal.core.PayPalHttpClient(environment);
 
 // Create a PayPal order
