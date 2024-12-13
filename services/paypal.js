@@ -6,7 +6,7 @@ const paypal = require('@paypal/checkout-server-sdk');
 //     'EEeChF0qX98lwCYe5QKOCg78JfeoQZ-UNFONK0bdmaFsGK-uNsZYOdlO2sWS-iCzZBv6Ihm2ALu_b-pa'
 // );
 
-const environment = new paypal.core.SandboxEnvironment(
+const environment = new paypal.core.LiveEnvironment(
     'AWIfQ50062-YIWiEMv87OeK3rmoKZBjBS57C5VtIXMV5Ua_H5MrjRneW4TJ89Svcv4dikk6l_XOJUR3T',
     'EJ07-G2Q3_DESm4b8MGveM0boOe3zJ68MHjKh8otlfwUzJJq2dasESjiupBARYXMcSJyhHpN3jkegx8r'
 ) 
