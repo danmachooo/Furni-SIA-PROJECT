@@ -72,7 +72,7 @@
                                 <% }) %>
                             </ul>
                         </td>
-                        <td>$<%= order.total_price %></td>
+                        <td>₱<%= order.total_price %></td>
                         <td>
                             <select class="form-select order-status" data-id="<%= order.id %>">
                                 <option value="Pending" <%= order.order_status === 'Pending' ? 'selected' : '' %>>Pending</option>
@@ -242,7 +242,7 @@
             }, {});
         
             const insights = `
-        This report contains ${totalOrders} total orders with a combined revenue of $${totalRevenue}.
+        This report contains ${totalOrders} total orders with a combined revenue of ₱${totalRevenue}.
         Here is a breakdown of order statuses:
         - Pending: ${statusCounts['Pending'] || 0}
         - Processing: ${statusCounts['Processing'] || 0}

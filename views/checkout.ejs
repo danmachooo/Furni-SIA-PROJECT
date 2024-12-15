@@ -22,12 +22,12 @@
                       <% cart.forEach(item => { %>
                         <tr>
                           <td><%= item.name %> <span class="badge bg-secondary mx-2"><%= item.quantity %></span></td>
-                          <td class="text-end">$<%= (item.price * item.quantity).toFixed(2) %></td>
+                          <td class="text-end">₱<%= (item.price * item.quantity).toFixed(2) %></td>
                         </tr>
                       <% }); %>
                       <tr class="table-active">
                         <td class="fw-bold">Order Total</td>
-                        <td class="fw-bold text-end">$<%= cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %></td>
+                        <td class="fw-bold text-end">₱<%= cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2) %></td>
                       </tr>
                     <% } else { %>
                       <tr>

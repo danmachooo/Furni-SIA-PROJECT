@@ -47,7 +47,7 @@
                             <img src="uploads/<%= item.image_path%>" class="img-fluid product-thumbnail" alt="<%= item.name %>" onerror="this.onerror=null; this.src='/path/to/default/image.jpg';">
                           </td>
                           <td class="product-name"><h2 class="h5 text-black"><%= item.name %></h2></td>
-                          <td class="product-price" id="price-<%= item.productId %>">$<%= item.price %></td>
+                          <td class="product-price" id="price-<%= item.productId %>">₱<%= item.price %></td>
                           <td>
                             <div class="input-group mb-3 d-flex align-items-center quantity-container" style="max-width: 120px;">
                               <div class="input-group-prepend">
@@ -59,7 +59,7 @@
                               </div>
                             </div>
                           </td>
-                          <td class="product-total" id="total-<%= item.productId %>">$<%= (item.price * item.quantity).toFixed(2) %></td>
+                          <td class="product-total" id="total-<%= item.productId %>">₱<%= (item.price * item.quantity).toFixed(2) %></td>
                           <td>
                             <a href="#" class="btn btn-black btn-sm" onclick="removeCartItem('<%= item.productId %>')">X</a>
                           </td>
@@ -93,14 +93,14 @@
                   </div>
                   <div class="row mb-3">
                     <div class="col-md-6"><span class="text-black">Subtotal</span></div>
-                    <div class="col-md-6 text-right"><strong class="text-black" id="cart-subtotal">$<%= cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2) %></strong></div>
+                    <div class="col-md-6 text-right"><strong class="text-black" id="cart-subtotal">₱<%= cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2) %></strong></div>
                   </div>
                   <div class="row mb-5">
                     <div class="col-md-6"><span class="text-black">Total</span></div>
-                    <div class="col-md-6 text-right"><strong class="text-black" id="cart-total">$<%= cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2) %></strong></div>
+                    <div class="col-md-6 text-right"><strong class="text-black" id="cart-total">₱<%= cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2) %></strong></div>
                   </div>
                   <div>
-                    <h2>Grand Total: <span id="grand-total">$0.00</span></h2>
+                    <h2>Grand Total: <span id="grand-total">₱0.00</span></h2>
                   </div>
                   <div class="row">
                     <div class="col-md-12">
@@ -185,7 +185,7 @@
         // Function to update the total for a single product
         function updateCartTotal(productId, quantity) {
           const priceText = document.getElementById(`price-${productId}`).innerText;
-          const price = parseFloat(priceText.replace('$', '').replace(',', '')); // Ensure comma is removed if present
+          const price = parseFloat(priceText.replace('₱', '').replace(',', '')); // Ensure comma is removed if present
     
           const totalElement = document.getElementById(`total-${productId}`);
           
@@ -196,7 +196,7 @@
           }
     
           const newTotal = (price * quantity).toFixed(2);
-          totalElement.innerText = `$${newTotal}`;
+          totalElement.innerText = `₱${newTotal}`;
     
           // Recalculate the subtotal for the entire cart
           recalculateSubtotal();
@@ -209,7 +209,7 @@
     
           totalElements.forEach(element => {
               const totalText = element.innerText;
-              const totalValue = parseFloat(totalText.replace('$', '').replace(',', '')); // Ensure comma is removed if present
+              const totalValue = parseFloat(totalText.replace('₱', '').replace(',', '')); // Ensure comma is removed if present
               
               // Check if totalValue is a valid number
               if (isNaN(totalValue)) {
@@ -220,15 +220,15 @@
               subtotal += totalValue;
           });
     
-          document.getElementById('cart-subtotal').innerText = `$${subtotal.toFixed(2)}`;
-          document.getElementById('cart-total').innerText = `$${subtotal.toFixed(2)}`;
+          document.getElementById('cart-subtotal').innerText = `₱${subtotal.toFixed(2)}`;
+          document.getElementById('cart-total').innerText = `₱${subtotal.toFixed(2)}`;
           recalculateGrandTotal(); // Update the grand total after subtotal changes
         }
     
         // Function to recalculate the grand total
         function recalculateGrandTotal() {
-          const subtotal = parseFloat(document.getElementById('cart-subtotal').innerText.replace('$', '').replace(',', '')); // Ensure comma is removed if present
-          document.getElementById('grand-total').innerText = `$${subtotal.toFixed(2)}`; // Ensure grand total reflects the subtotal
+          const subtotal = parseFloat(document.getElementById('cart-subtotal').innerText.replace('₱', '').replace(',', '')); // Ensure comma is removed if present
+          document.getElementById('grand-total').innerText = `₱${subtotal.toFixed(2)}`; // Ensure grand total reflects the subtotal
         }
     
         // Function to remove an item from the cart
